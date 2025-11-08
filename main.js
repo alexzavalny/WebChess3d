@@ -186,11 +186,11 @@ function addBoardNotation() {
 
   files.forEach((file, index) => {
     const x = (index - 3.5) * boardConfig.squareSize;
-    const bottom = createLabelMesh(file, 0.5);
+    const bottom = createLabelMesh(file, 0.5, Math.PI);
     bottom.position.set(x, labelHeight, -offset);
     notationGroup.add(bottom);
 
-    const top = createLabelMesh(file, 0.5);
+    const top = createLabelMesh(file, 0.5, 0);
     top.position.set(x, labelHeight, offset);
     notationGroup.add(top);
   });
@@ -198,17 +198,17 @@ function addBoardNotation() {
   const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
   ranks.forEach((rank, index) => {
     const z = (index - 3.5) * boardConfig.squareSize;
-    const left = createLabelMesh(rank, 0.5);
+    const left = createLabelMesh(rank, 0.5, -Math.PI / 2);
     left.position.set(-offset, labelHeight, z);
     notationGroup.add(left);
 
-    const right = createLabelMesh(rank, 0.5);
+    const right = createLabelMesh(rank, 0.5, Math.PI / 2);
     right.position.set(offset, labelHeight, z);
     notationGroup.add(right);
   });
 }
 
-function createLabelMesh(text, size = 0.45) {
+function createLabelMesh(text, size = 0.45, textRotation = 0) {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
@@ -220,7 +220,9 @@ function createLabelMesh(text, size = 0.45) {
   ctx.font = 'bold 140px "Source Sans Pro", "Segoe UI", sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text.toUpperCase(), canvas.width / 2, canvas.height / 2);
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate(textRotation);
+  ctx.fillText(text.toUpperCase(), 0, 0);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
