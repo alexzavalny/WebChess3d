@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { boardConfig, files, pieceBaseY } from './config.js';
+import { boardConfig, files, pieceBaseY, tableSurfaceY } from './config.js';
 
 export function createPieceManager(squareCenters) {
   const piecesGroup = new THREE.Group();
@@ -120,6 +120,7 @@ export function createPieceManager(squareCenters) {
     if (!center) {
       throw new Error(`Square ${square} outside board`);
     }
+    mesh.userData.baseY = pieceBaseY;
     mesh.position.set(center.x, mesh.userData.baseY, center.z);
     mesh.userData.square = square;
     piecesBySquare.set(square, mesh);
@@ -137,9 +138,20 @@ export function createPieceManager(squareCenters) {
       piecesGroup.remove(occupying);
     }
     const center = squareCenters.get(square);
+    piece.userData.baseY = pieceBaseY;
     piece.position.set(center.x, piece.userData.baseY, center.z);
     piece.userData.square = square;
     piecesBySquare.set(square, piece);
+  };
+
+  const dropPieceOffBoard = (piece, position) => {
+    if (!piece || !position) return;
+    if (piece.userData.square) {
+      piecesBySquare.delete(piece.userData.square);
+      piece.userData.square = null;
+    }
+    piece.userData.baseY = tableSurfaceY;
+    piece.position.set(position.x, tableSurfaceY, position.z);
   };
 
   const squareFromWorld = (position) => {
@@ -168,6 +180,7 @@ export function createPieceManager(squareCenters) {
     buildPiece,
     placePiece,
     movePieceToSquare,
+    dropPieceOffBoard,
     squareFromWorld,
     clear,
     loadPieces,

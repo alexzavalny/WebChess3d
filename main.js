@@ -54,6 +54,7 @@ const dragController = createDragController({
   piecesGroup: pieceManager.group,
   squareFromWorld: pieceManager.squareFromWorld,
   movePieceToSquare: pieceManager.movePieceToSquare,
+  dropPieceOffBoard: pieceManager.dropPieceOffBoard,
 });
 
 addBoardNotation(notationGroup);

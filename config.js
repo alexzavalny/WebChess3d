@@ -7,4 +7,5 @@ export const boardConfig = {
   edgePadding: 1.2,
 };
 export const pieceBaseY = boardConfig.baseThickness + boardConfig.tileThickness;
-export const pieceHoverLift = 0.2;
+export const pieceHoverLift = 0.4;
+export const tableSurfaceY = 0;

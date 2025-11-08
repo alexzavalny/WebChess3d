@@ -1,15 +1,22 @@
 import * as THREE from 'three';
 import { pieceBaseY, pieceHoverLift } from './config.js';
 
-export function createDragController({ canvas, camera, controls, piecesGroup, squareFromWorld, movePieceToSquare }) {
+export function createDragController({
+  canvas,
+  camera,
+  controls,
+  piecesGroup,
+  squareFromWorld,
+  movePieceToSquare,
+  dropPieceOffBoard,
+}) {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -pieceBaseY);
+  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const dragIntersection = new THREE.Vector3();
   const dragOffset = new THREE.Vector3();
 
   let activePiece = null;
-  let dragStartSquare = null;
 
   const getBaseHeight = (piece) => (piece?.userData?.baseY ?? pieceBaseY);
 
@@ -46,10 +53,8 @@ export function createDragController({ canvas, camera, controls, piecesGroup, sq
     if (!picked) return;
     activePiece = picked;
     controls.enabled = false;
-    dragStartSquare = picked.userData.square;
-
     raycaster.setFromCamera(pointer, camera);
-    dragPlane.constant = -pieceBaseY;
+    dragPlane.constant = -getBaseHeight(activePiece);
     if (raycaster.ray.intersectPlane(dragPlane, dragIntersection)) {
       dragOffset.copy(dragIntersection).sub(activePiece.position);
     } else {
@@ -63,7 +68,7 @@ export function createDragController({ canvas, camera, controls, piecesGroup, sq
     if (!activePiece) return;
     updatePointer(event);
     raycaster.setFromCamera(pointer, camera);
-    dragPlane.constant = -pieceBaseY;
+    dragPlane.constant = -getBaseHeight(activePiece);
     if (raycaster.ray.intersectPlane(dragPlane, dragIntersection)) {
       activePiece.position.x = dragIntersection.x - dragOffset.x;
       activePiece.position.z = dragIntersection.z - dragOffset.z;
@@ -73,7 +78,11 @@ export function createDragController({ canvas, camera, controls, piecesGroup, sq
   const onPointerUp = () => {
     if (!activePiece) return;
     const snappedSquare = squareFromWorld(activePiece.position);
-    movePieceToSquare(activePiece, snappedSquare || dragStartSquare);
+    if (snappedSquare) {
+      movePieceToSquare(activePiece, snappedSquare);
+    } else {
+      dropPieceOffBoard(activePiece, activePiece.position);
+    }
     cancelDrag();
   };
 
@@ -82,7 +91,6 @@ export function createDragController({ canvas, camera, controls, piecesGroup, sq
       lowerPiece(activePiece);
     }
     activePiece = null;
-    dragStartSquare = null;
     controls.enabled = true;
   };
 
