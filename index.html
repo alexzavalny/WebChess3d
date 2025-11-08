@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebChess 3D</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230f1117'/%3E%3Cpath d='M20 44h24M24 20h16l4 20H20l4-20z' stroke='%23f5f7ff' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <section class="controls">
+        <h1>WebChess 3D</h1>
+        <label for="fen-input">Forsyth–Edwards Notation (FEN)</label>
+        <textarea id="fen-input" rows="2" spellcheck="false"></textarea>
+        <div class="buttons">
+          <button id="load-btn">Load Position</button>
+          <button id="reset-btn">Reset Camera</button>
+        </div>
+        <p id="status" class="status"></p>
+        <p class="hint">
+          Paste any legal FEN and press Load. Drag with left mouse to move pieces,
+          right mouse to orbit, and scroll to zoom.
+        </p>
+      </section>
+      <section class="viewport">
+        <canvas id="scene"></canvas>
+      </section>
+    </main>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/examples/jsm/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js"
+        }
+      }
+    </script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
