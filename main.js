@@ -19,7 +19,10 @@ const editorClearBtn = document.getElementById('editor-clear');
 const editorStartBtn = document.getElementById('editor-start');
 const editorApplyBtn = document.getElementById('editor-apply');
 const editorBoardContainer = document.getElementById('editor-board');
-fenInput.value = defaultFEN;
+
+const fenFromUrl = new URL(window.location.href).searchParams.get('fen');
+const initialFen = fenFromUrl && fenFromUrl.trim() ? fenFromUrl.trim() : defaultFEN;
+fenInput.value = initialFen;
 
 const renderer = createRenderer(canvas);
 const scene = createScene();
@@ -49,7 +52,7 @@ const dragController = createDragController({
 });
 
 addBoardNotation(notationGroup);
-loadPosition(defaultFEN);
+loadPosition(initialFen);
 
 const boardEditor = createBoardEditor({
   modal,
@@ -78,14 +81,24 @@ window.addEventListener('keydown', onKeyDown);
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
 function loadPosition(fen) {
+  const fenString = fen && fen.trim() ? fen.trim() : defaultFEN;
   try {
-    const parsed = parseFEN(fen);
+    const parsed = parseFEN(fenString);
     dragController.cancelDrag();
     pieceManager.loadPieces(parsed);
+    fenInput.value = fenString;
+    updateFenQueryParam(fenString);
     setStatus('Position loaded', false);
   } catch (error) {
     setStatus(error.message || 'Invalid FEN', true);
   }
+}
+
+function updateFenQueryParam(fen) {
+  if (!fen) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('fen', fen);
+  window.history.replaceState(null, '', url);
 }
 
 function setStatus(message, isError) {

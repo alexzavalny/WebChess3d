@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { pieceBaseY } from './config.js';
+import { pieceBaseY, pieceHoverLift } from './config.js';
 
 export function createDragController({ canvas, camera, controls, piecesGroup, squareFromWorld, movePieceToSquare }) {
   const raycaster = new THREE.Raycaster();
@@ -10,6 +10,18 @@ export function createDragController({ canvas, camera, controls, piecesGroup, sq
 
   let activePiece = null;
   let dragStartSquare = null;
+
+  const getBaseHeight = (piece) => (piece?.userData?.baseY ?? pieceBaseY);
+
+  const raisePiece = (piece) => {
+    if (!piece) return;
+    piece.position.y = getBaseHeight(piece) + pieceHoverLift;
+  };
+
+  const lowerPiece = (piece) => {
+    if (!piece) return;
+    piece.position.y = getBaseHeight(piece);
+  };
 
   const updatePointer = (event) => {
     const bounds = canvas.getBoundingClientRect();
@@ -43,6 +55,7 @@ export function createDragController({ canvas, camera, controls, piecesGroup, sq
     } else {
       dragOffset.set(0, 0, 0);
     }
+    raisePiece(activePiece);
     event.preventDefault();
   };
 
@@ -65,6 +78,9 @@ export function createDragController({ canvas, camera, controls, piecesGroup, sq
   };
 
   const cancelDrag = () => {
+    if (activePiece) {
+      lowerPiece(activePiece);
+    }
     activePiece = null;
     dragStartSquare = null;
     controls.enabled = true;
