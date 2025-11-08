@@ -7,42 +7,42 @@ export function createPieceManager(squareCenters) {
 
   const buildPiece = (type, color) => {
     const material = new THREE.MeshStandardMaterial({
-      color: color === 'w' ? 0xf8f8ff : 0x101318,
-      roughness: 0.35,
-      metalness: 0.15,
+      color: color === 'w' ? 0xd9c19d : 0x5c3b1e,
+      roughness: 0.5,
+      metalness: 0.1,
     });
 
     const group = new THREE.Group();
     group.userData = { type, color, square: null, baseY: pieceBaseY };
 
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 0.12, 24), material);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.3, 0.12, 32), material);
     base.castShadow = true;
     base.receiveShadow = true;
     base.position.y = 0.06;
     group.add(base);
 
-    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 0.3, 24), material);
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.26, 0.38, 32), material);
     stem.castShadow = true;
     stem.position.y = 0.27;
     group.add(stem);
 
     switch (type) {
       case 'p': {
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 24, 16), material);
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 24, 16), material);
         head.castShadow = true;
         head.position.y = 0.52;
         group.add(head);
         break;
       }
       case 'r': {
-        const top = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.2, 6), material);
+        const top = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.2, 12), material);
         top.castShadow = true;
         top.position.y = 0.55;
         group.add(top);
         break;
       }
       case 'n': {
-        const head = new THREE.Mesh(new THREE.CapsuleGeometry(0.18, 0.3, 8, 16), material);
+        const head = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.32, 8, 16), material);
         head.position.set(0, 0.55, 0.1);
         head.rotation.z = Math.PI / 2.3;
         head.castShadow = true;
@@ -50,46 +50,46 @@ export function createPieceManager(squareCenters) {
         break;
       }
       case 'b': {
-        const top = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.45, 24), material);
+        const top = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.52, 24), material);
         top.position.y = 0.7;
         top.castShadow = true;
         group.add(top);
         break;
       }
-    case 'q': {
-      const lowerCrown = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.37, 0.35, 32), material);
-      lowerCrown.position.y = 0.7;
-      lowerCrown.castShadow = true;
-      group.add(lowerCrown);
+      case 'q': {
+        const lowerCrown = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.24, 0.38, 32), material);
+        lowerCrown.position.y = 0.7;
+        lowerCrown.castShadow = true;
+        group.add(lowerCrown);
 
-      const crownBand = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.035, 12, 32), material);
-      crownBand.rotation.x = Math.PI / 2;
-      crownBand.position.y = 0.9;
-      crownBand.castShadow = true;
-      group.add(crownBand);
+        const crownBand = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.022, 12, 32), material);
+        crownBand.rotation.x = Math.PI / 2;
+        crownBand.position.y = 0.9;
+        crownBand.castShadow = true;
+        group.add(crownBand);
 
-      const spikeGeo = new THREE.ConeGeometry(0.085, 0.24, 12);
-      for (let i = 0; i < 6; i += 1) {
-        const angle = (i / 6) * Math.PI * 2;
-        const spike = new THREE.Mesh(spikeGeo, material);
-        spike.position.set(Math.cos(angle) * 0.18, 1, Math.sin(angle) * 0.18);
-        spike.castShadow = true;
-        group.add(spike);
+        const spikeGeo = new THREE.ConeGeometry(0.05, 0.26, 12);
+        for (let i = 0; i < 6; i += 1) {
+          const angle = (i / 6) * Math.PI * 2;
+          const spike = new THREE.Mesh(spikeGeo, material);
+          spike.position.set(Math.cos(angle) * 0.13, 1.02, Math.sin(angle) * 0.13);
+          spike.castShadow = true;
+          group.add(spike);
+        }
+
+        break;
       }
-
-      break;
-    }
       case 'k':
       default: {
-        const neck = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.4, 24), material);
+        const neck = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.48, 24), material);
         neck.position.y = 0.75;
         neck.castShadow = true;
         group.add(neck);
-        const cross = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.35, 0.08), material);
+        const cross = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.36, 0.045), material);
         cross.position.y = 1;
         cross.castShadow = true;
         group.add(cross);
-        const crossBar = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.08, 0.08), material);
+        const crossBar = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.08, 0.045), material);
         crossBar.position.y = 1.05;
         crossBar.castShadow = true;
         group.add(crossBar);
