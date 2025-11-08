@@ -1,9 +1,12 @@
 import * as THREE from 'three';
 import { boardConfig } from './config.js';
 
+const FLOOR_Y = -2.5;
+
 export function createEnvironment() {
   const group = new THREE.Group();
   group.add(createTable());
+  group.add(createChairs());
   const roomShell = createRoomShell();
   group.add(roomShell);
 
@@ -86,11 +89,77 @@ function createTable() {
   return group;
 }
 
+function createChairs() {
+  const boardSpan = boardConfig.squareSize * 8;
+  const tableLength = boardSpan + boardConfig.edgePadding * 8;
+  const tableWidth = tableLength * 0.8;
+  const seatWidth = tableLength * 0.26;
+  const seatDepth = tableWidth * 0.27;
+  const seatThickness = 0.12;
+  const seatTopY = FLOOR_Y + 0.7;
+  const seatY = seatTopY - seatThickness / 2;
+  const backHeight = 0.95;
+  const backThickness = 0.06;
+  const legSize = 0.1;
+  const legHeight = seatTopY - seatThickness - FLOOR_Y;
+  const legY = FLOOR_Y + legHeight / 2;
+  const seatOffsetZ = tableWidth / 2 + seatDepth / 2 + 0.25;
+
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x4a2e1a,
+    roughness: 0.8,
+    metalness: 0.04,
+  });
+
+  const group = new THREE.Group();
+
+  const createChair = (zOffset) => {
+    const chair = new THREE.Group();
+
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(seatWidth, seatThickness, seatDepth), material);
+    seat.position.set(0, seatY, zOffset);
+    seat.castShadow = true;
+    seat.receiveShadow = true;
+    chair.add(seat);
+
+    const direction = Math.sign(zOffset) || 1;
+    const back = new THREE.Mesh(new THREE.BoxGeometry(seatWidth, backHeight, backThickness), material);
+    back.position.set(
+      0,
+      seatTopY + backHeight / 2 - seatThickness,
+      zOffset + direction * (seatDepth / 2 - backThickness / 2),
+    );
+    back.castShadow = true;
+    back.receiveShadow = true;
+    chair.add(back);
+
+    const legGeometry = new THREE.CylinderGeometry(legSize / 2, legSize / 2, legHeight, 10);
+    const legPositions = [
+      [seatWidth / 2 - legSize / 2, legY, zOffset + seatDepth / 2 - legSize / 2],
+      [-seatWidth / 2 + legSize / 2, legY, zOffset + seatDepth / 2 - legSize / 2],
+      [seatWidth / 2 - legSize / 2, legY, zOffset - seatDepth / 2 + legSize / 2],
+      [-seatWidth / 2 + legSize / 2, legY, zOffset - seatDepth / 2 + legSize / 2],
+    ];
+    legPositions.forEach(([x, y, z]) => {
+      const leg = new THREE.Mesh(legGeometry, material);
+      leg.position.set(x, y, z);
+      leg.castShadow = true;
+      leg.receiveShadow = true;
+      chair.add(leg);
+    });
+
+    return chair;
+  };
+
+  group.add(createChair(seatOffsetZ));
+  group.add(createChair(-seatOffsetZ));
+  return group;
+}
+
 function createRoomShell() {
   const roomWidth = 25;
   const roomDepth = 25;
   const roomHeight = 12;
-  const floorHeight = -2.5;
   const wallThickness = 0.4;
 
   const group = new THREE.Group();
@@ -121,11 +190,11 @@ function createRoomShell() {
   });
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomWidth, roomDepth), floorMaterial);
   floor.rotation.x = -Math.PI / 2;
-  floor.position.y = floorHeight;
+  floor.position.y = FLOOR_Y;
   floor.receiveShadow = true;
   group.add(floor);
 
-  const wallHeightCenter = floorHeight + roomHeight / 2;
+  const wallHeightCenter = FLOOR_Y + roomHeight / 2;
   const sideWallGeometry = new THREE.BoxGeometry(wallThickness, roomHeight, roomDepth);
   const backWallGeometry = new THREE.BoxGeometry(roomWidth, roomHeight, wallThickness);
 
