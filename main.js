@@ -7,6 +7,7 @@ const boardConfig = {
   squareSize: 1,
   baseThickness: 0.25,
   tileThickness: 0.08,
+  edgePadding: 1.2,
 };
 const pieceBaseY = boardConfig.baseThickness + boardConfig.tileThickness;
 
@@ -124,16 +125,14 @@ function addLights() {
 function buildBoard() {
   const group = new THREE.Group();
   const boardSize = boardConfig.squareSize * 8;
+  const baseSize = boardSize + boardConfig.edgePadding * 2;
 
   const baseMaterial = new THREE.MeshStandardMaterial({
     color: 0x1c1f2c,
     roughness: 0.6,
     metalness: 0.2,
   });
-  const base = new THREE.Mesh(
-    new THREE.BoxGeometry(boardSize + 0.4, boardConfig.baseThickness, boardSize + 0.4),
-    baseMaterial,
-  );
+  const base = new THREE.Mesh(new THREE.BoxGeometry(baseSize, boardConfig.baseThickness, baseSize), baseMaterial);
   base.receiveShadow = true;
   base.position.y = boardConfig.baseThickness / 2;
   group.add(base);
@@ -181,9 +180,9 @@ function buildSquareLookup() {
 
 function addBoardNotation() {
   notationGroup.clear();
-  const half = (boardConfig.squareSize * 8) / 2; // 4 squares each direction
-  const offset = half + 0.35;
-  const labelHeight = pieceBaseY + boardConfig.tileThickness + 0.02;
+  const half = (boardConfig.squareSize * 8) / 2;
+  const offset = half + boardConfig.edgePadding / 2;
+  const labelHeight = boardConfig.baseThickness + 0.005;
 
   files.forEach((file, index) => {
     const x = (index - 3.5) * boardConfig.squareSize;
