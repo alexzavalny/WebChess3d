@@ -123,12 +123,16 @@ function onKeyDown(event) {
   }
 }
 
-function animate() {
+let lastTime = null;
+function animate(time) {
   requestAnimationFrame(animate);
+  const delta = lastTime === null ? 0 : (time - lastTime) / 1000;
+  lastTime = time;
   controls.update();
+  pieceManager.update(delta);
   if (updateEnvironmentVisibility) {
     updateEnvironmentVisibility(camera);
   }
   renderer.render(scene, camera);
 }
-animate();
+requestAnimationFrame(animate);

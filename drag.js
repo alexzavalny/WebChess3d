@@ -81,7 +81,7 @@ export function createDragController({
     if (snappedSquare) {
       movePieceToSquare(activePiece, snappedSquare);
     } else {
-      dropPieceOffBoard(activePiece, activePiece.position);
+      dropPieceOffBoard(activePiece, activePiece.position, { animate: false });
     }
     cancelDrag();
   };

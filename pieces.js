@@ -4,6 +4,90 @@ import { boardConfig, files, pieceBaseY, tableSurfaceY } from './config.js';
 export function createPieceManager(squareCenters) {
   const piecesGroup = new THREE.Group();
   const piecesBySquare = new Map();
+  const boardSpan = boardConfig.squareSize * 8;
+  const boardHalf = boardSpan / 2;
+  const boardBaseHalf = boardHalf + boardConfig.edgePadding;
+  const tableLength = boardSpan + boardConfig.edgePadding * 8;
+  const tableHalfX = tableLength / 2;
+  const tableHalfZ = (tableLength * 0.8) / 2; // matches environment table width
+  const tableMargin = 0.35;
+  const activeAnimations = new Set();
+  const tempPosition = new THREE.Vector3();
+
+  const easeOutCubic = (t) => 1 - (1 - t) ** 3;
+
+  const stopAnimationsForPiece = (piece) => {
+    const toRemove = [];
+    activeAnimations.forEach((animation) => {
+      if (animation.piece === piece) {
+        toRemove.push(animation);
+      }
+    });
+    toRemove.forEach((animation) => activeAnimations.delete(animation));
+  };
+
+  const startPieceAnimation = (piece, targetPosition, duration = 0.8) => {
+    if (!piece || !targetPosition) return;
+    stopAnimationsForPiece(piece);
+    activeAnimations.add({
+      piece,
+      from: piece.position.clone(),
+      to: targetPosition.clone(),
+      elapsed: 0,
+      duration,
+      arcHeight: 0.25,
+    });
+  };
+
+  const updateAnimations = (delta = 0) => {
+    if (!activeAnimations.size) return;
+    const completed = [];
+    activeAnimations.forEach((animation) => {
+      animation.elapsed += delta;
+      const progress = animation.duration > 0 ? Math.min(animation.elapsed / animation.duration, 1) : 1;
+      const eased = easeOutCubic(progress);
+      tempPosition.copy(animation.from).lerp(animation.to, eased);
+      tempPosition.y += Math.sin(Math.PI * eased) * animation.arcHeight;
+      animation.piece.position.copy(tempPosition);
+      if (progress >= 1) {
+        animation.piece.position.copy(animation.to);
+        animation.piece.userData.baseY = tableSurfaceY;
+        completed.push(animation);
+      }
+    });
+    completed.forEach((animation) => activeAnimations.delete(animation));
+  };
+
+  const clampToTable = (position) => {
+    position.x = THREE.MathUtils.clamp(position.x, -tableHalfX + tableMargin, tableHalfX - tableMargin);
+    position.z = THREE.MathUtils.clamp(position.z, -tableHalfZ + tableMargin, tableHalfZ - tableMargin);
+    return position;
+  };
+
+  const keepOffBoardBase = (position) => {
+    if (Math.abs(position.x) <= boardBaseHalf && Math.abs(position.z) <= boardBaseHalf) {
+      if (Math.abs(position.x) > Math.abs(position.z)) {
+        position.x = Math.sign(position.x || 1) * (boardBaseHalf + tableMargin);
+      } else {
+        position.z = Math.sign(position.z || 1) * (boardBaseHalf + tableMargin);
+      }
+    }
+    return position;
+  };
+
+  const snapToTableSurface = (position) => keepOffBoardBase(clampToTable(position));
+
+  const getRandomTablePosition = () => {
+    for (let i = 0; i < 20; i += 1) {
+      const x = THREE.MathUtils.randFloatSpread(tableHalfX * 2);
+      const z = THREE.MathUtils.randFloatSpread(tableHalfZ * 2);
+      if (Math.abs(x) > boardBaseHalf || Math.abs(z) > boardBaseHalf) {
+        return snapToTableSurface(new THREE.Vector3(x, tableSurfaceY, z));
+      }
+    }
+    const fallback = new THREE.Vector3(boardBaseHalf + tableMargin, tableSurfaceY, 0);
+    return snapToTableSurface(fallback);
+  };
 
   const buildPiece = (type, color) => {
     const material = new THREE.MeshStandardMaterial({
@@ -135,7 +219,7 @@ export function createPieceManager(squareCenters) {
     const occupying = piecesBySquare.get(square);
     if (occupying && occupying !== piece) {
       piecesBySquare.delete(square);
-      piecesGroup.remove(occupying);
+      dropPieceOffBoard(occupying, getRandomTablePosition(), { animate: true });
     }
     const center = squareCenters.get(square);
     piece.userData.baseY = pieceBaseY;
@@ -144,14 +228,23 @@ export function createPieceManager(squareCenters) {
     piecesBySquare.set(square, piece);
   };
 
-  const dropPieceOffBoard = (piece, position) => {
+  const dropPieceOffBoard = (piece, position, options = {}) => {
+    const { animate = false, duration = 0.8 } = options;
     if (!piece || !position) return;
     if (piece.userData.square) {
       piecesBySquare.delete(piece.userData.square);
       piece.userData.square = null;
     }
-    piece.userData.baseY = tableSurfaceY;
-    piece.position.set(position.x, tableSurfaceY, position.z);
+    const destination = position.clone ? position.clone() : new THREE.Vector3(position.x, position.y, position.z);
+    destination.y = tableSurfaceY;
+    snapToTableSurface(destination);
+    if (animate) {
+      startPieceAnimation(piece, destination, duration);
+    } else {
+      stopAnimationsForPiece(piece);
+      piece.userData.baseY = tableSurfaceY;
+      piece.position.copy(destination);
+    }
   };
 
   const squareFromWorld = (position) => {
@@ -164,6 +257,7 @@ export function createPieceManager(squareCenters) {
   const clear = () => {
     piecesGroup.clear();
     piecesBySquare.clear();
+    activeAnimations.clear();
   };
 
   const loadPieces = (pieces) => {
@@ -184,5 +278,6 @@ export function createPieceManager(squareCenters) {
     squareFromWorld,
     clear,
     loadPieces,
+    update: updateAnimations,
   };
 }
