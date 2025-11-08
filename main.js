@@ -6,6 +6,7 @@ import { parseFEN } from './fen.js';
 import { createDragController } from './drag.js';
 import { createPieceManager } from './pieces.js';
 import { addLights, createCamera, createControls, createRenderer, createScene, resizeRenderer } from './scene.js';
+import { createEnvironment } from './environment.js';
 
 const canvas = document.getElementById('scene');
 const fenInput = document.getElementById('fen-input');
@@ -31,6 +32,10 @@ const controls = createControls(camera, canvas);
 resizeRenderer(renderer, camera, canvas);
 
 addLights(scene);
+
+const environment = createEnvironment();
+scene.add(environment);
+const updateEnvironmentVisibility = environment.userData?.updateVisibility;
 
 const boardGroup = buildBoard();
 scene.add(boardGroup);
@@ -120,6 +125,9 @@ function onKeyDown(event) {
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
+  if (updateEnvironmentVisibility) {
+    updateEnvironmentVisibility(camera);
+  }
   renderer.render(scene, camera);
 }
 animate();
