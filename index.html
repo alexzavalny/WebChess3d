@@ -9,6 +9,12 @@
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230f1117'/%3E%3Cpath d='M20 44h24M24 20h16l4 20H20l4-20z' stroke='%23f5f7ff' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
     />
     <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
+      integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
+      crossorigin="anonymous"
+    />
   </head>
   <body>
     <main>
@@ -19,6 +25,7 @@
         <div class="buttons">
           <button id="load-btn">Load Position</button>
           <button id="reset-btn">Reset Camera</button>
+          <button id="edit-btn">Edit Board</button>
         </div>
         <p id="status" class="status"></p>
         <p class="hint">
@@ -30,6 +37,38 @@
         <canvas id="scene"></canvas>
       </section>
     </main>
+    <div id="editor-modal" class="modal hidden">
+      <div class="modal-dialog">
+        <header class="modal-header">
+          <h2>Edit Board</h2>
+          <button class="icon-btn" id="editor-close" aria-label="Close editor">&times;</button>
+        </header>
+        <div class="modal-body">
+          <div id="editor-board" class="editor-board"></div>
+          <aside class="editor-sidebar">
+            <p>
+              Drag pieces from the spare set to the board, or drag pieces off the board to remove
+              them. Use the buttons below when ready.
+            </p>
+            <div class="editor-buttons">
+              <button id="editor-clear" class="ghost">Clear Board</button>
+              <button id="editor-start" class="ghost">Starting Position</button>
+              <button id="editor-apply" class="primary">Save &amp; Apply</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.min.js"
+      integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+      integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+      crossorigin="anonymous"
+    ></script>
     <script type="importmap">
       {
         "imports": {

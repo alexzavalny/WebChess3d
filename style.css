@@ -63,6 +63,7 @@ textarea {
 .buttons {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 button {
@@ -121,6 +122,96 @@ canvas {
   display: block;
 }
 
+.ghost {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  flex: initial;
+}
+
+.primary {
+  background: var(--accent);
+  color: #04232f;
+  flex: initial;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 6, 12, 0.85);
+  z-index: 20;
+  padding: 1.5rem;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-dialog {
+  width: min(960px, 100%);
+  max-height: min(90vh, 720px);
+  background: var(--panel);
+  border-radius: 18px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-body {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  overflow: auto;
+}
+
+.icon-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  font-size: 1.5rem;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+  flex: initial;
+}
+
+.icon-btn:active {
+  transform: none;
+}
+
+.editor-board {
+  width: 420px;
+  max-width: 60vw;
+}
+
+.editor-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #b3b8d8;
+}
+
+.editor-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 900px) {
   main {
     grid-template-columns: 1fr;
@@ -129,5 +220,14 @@ canvas {
 
   .viewport {
     min-height: 60vh;
+  }
+
+  .modal-body {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .editor-board {
+    max-width: 100%;
   }
 }

@@ -14,7 +14,14 @@ const canvas = document.getElementById('scene');
 const fenInput = document.getElementById('fen-input');
 const loadBtn = document.getElementById('load-btn');
 const resetBtn = document.getElementById('reset-btn');
+const editBtn = document.getElementById('edit-btn');
 const statusEl = document.getElementById('status');
+const modal = document.getElementById('editor-modal');
+const modalCloseBtn = document.getElementById('editor-close');
+const editorClearBtn = document.getElementById('editor-clear');
+const editorStartBtn = document.getElementById('editor-start');
+const editorApplyBtn = document.getElementById('editor-apply');
+const editorBoardContainer = document.getElementById('editor-board');
 fenInput.value = defaultFEN;
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -53,6 +60,7 @@ const dragIntersection = new THREE.Vector3();
 const dragOffset = new THREE.Vector3();
 let activePiece = null;
 let dragStartSquare = null;
+let editorBoard = null;
 
 loadPosition(defaultFEN);
 
@@ -61,11 +69,32 @@ resetBtn.addEventListener('click', () => {
   controls.reset();
   setStatus('Camera reset', false);
 });
+editBtn.addEventListener('click', openEditor);
+modalCloseBtn.addEventListener('click', closeEditor);
+modal.addEventListener('click', (event) => {
+  if (event.target === modal) {
+    closeEditor();
+  }
+});
+editorClearBtn.addEventListener('click', () => {
+  ensureEditorBoard();
+  editorBoard?.clear(true);
+});
+editorStartBtn.addEventListener('click', () => {
+  ensureEditorBoard();
+  editorBoard?.start(true);
+});
+editorApplyBtn.addEventListener('click', applyEditorPosition);
 
 canvas.addEventListener('pointerdown', onPointerDown);
 window.addEventListener('pointermove', onPointerMove);
 window.addEventListener('pointerup', onPointerUp);
 window.addEventListener('resize', onResize);
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+    closeEditor();
+  }
+});
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
 function addLights() {
@@ -212,6 +241,68 @@ function parseFEN(fen) {
 function setStatus(message, isError) {
   statusEl.textContent = message;
   statusEl.classList.toggle('error', Boolean(isError));
+}
+
+function openEditor() {
+  if (!ensureEditorBoard()) {
+    return;
+  }
+  const placement = extractPlacementFromFen(fenInput.value);
+  if (placement === 'start') {
+    editorBoard.start(false);
+  } else {
+    editorBoard.position(placement, false);
+  }
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => editorBoard?.resize(), 50);
+}
+
+function closeEditor() {
+  modal.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function ensureEditorBoard() {
+  if (editorBoard) return true;
+  if (typeof window === 'undefined' || !window.Chessboard) {
+    setStatus('Editor failed to load. Check your connection.', true);
+    return false;
+  }
+  editorBoard = window.Chessboard(editorBoardContainer || 'editor-board', {
+    draggable: true,
+    sparePieces: true,
+    dropOffBoard: 'trash',
+    appearSpeed: 150,
+    moveSpeed: 100,
+    snapSpeed: 80,
+    snapbackSpeed: 60,
+  });
+  return true;
+}
+
+function extractPlacementFromFen(fen) {
+  const placement = fen?.trim().split(/\s+/)[0];
+  if (!placement || placement === 'start') {
+    return 'start';
+  }
+  return placement;
+}
+
+function buildFenFromPlacement(placement) {
+  const rest = fenInput.value.trim().split(/\s+/).slice(1);
+  const defaults = ['w', '-', '-', '0', '1'];
+  const merged = defaults.map((def, index) => rest[index] ?? def);
+  return [placement || '8/8/8/8/8/8/8/8', ...merged].join(' ');
+}
+
+function applyEditorPosition() {
+  if (!ensureEditorBoard()) return;
+  const placement = editorBoard.fen();
+  const nextFen = buildFenFromPlacement(placement);
+  fenInput.value = nextFen;
+  loadPosition(nextFen);
+  closeEditor();
 }
 
 function buildPiece(type, color) {
@@ -397,6 +488,9 @@ function updatePointer(event) {
 
 function onResize() {
   resizeRenderer();
+  if (editorBoard && !modal.classList.contains('hidden')) {
+    editorBoard.resize();
+  }
 }
 
 function resizeRenderer() {
