@@ -150,7 +150,7 @@ function buildBoard() {
       tile.position.set(
         (file - 3.5) * boardConfig.squareSize,
         boardConfig.baseThickness + boardConfig.tileThickness / 2,
-        (rank - 3.5) * boardConfig.squareSize,
+        (7 - rank - 3.5) * boardConfig.squareSize,
       );
       group.add(tile);
     }
@@ -167,7 +167,7 @@ function buildSquareLookup() {
       const center = new THREE.Vector3(
         (file - 3.5) * boardConfig.squareSize,
         0,
-        (rank - 3.5) * boardConfig.squareSize,
+        (7 - rank - 3.5) * boardConfig.squareSize,
       );
       map.set(square, center);
     }
@@ -475,7 +475,7 @@ function movePieceToSquare(piece, square) {
 
 function worldToSquare(position) {
   const file = Math.round(position.x / boardConfig.squareSize + 3.5);
-  const rank = Math.round(position.z / boardConfig.squareSize + 3.5);
+  const rank = Math.round(3.5 - position.z / boardConfig.squareSize);
   if (file < 0 || file > 7 || rank < 0 || rank > 7) return null;
   return `${files[file]}${rank + 1}`;
 }
