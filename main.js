@@ -144,7 +144,7 @@ function buildBoard() {
         boardConfig.tileThickness,
         boardConfig.squareSize,
       );
-      const material = (file + rank) % 2 === 0 ? lightMat : darkMat;
+      const material = (file + rank) % 2 === 0 ? darkMat : lightMat;
       const tile = new THREE.Mesh(tileGeo, material);
       tile.receiveShadow = true;
       tile.position.set(
