@@ -35,10 +35,20 @@ export function createPieceManager(squareCenters) {
         break;
       }
       case 'r': {
-        const top = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.2, 12), material);
-        top.castShadow = true;
-        top.position.y = 0.55;
-        group.add(top);
+        const turretBase = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.16, 24), material);
+        turretBase.castShadow = true;
+        turretBase.position.y = 0.55;
+        group.add(turretBase);
+
+        const crenellationGeo = new THREE.BoxGeometry(0.08, 0.16, 0.14);
+        for (let i = 0; i < 4; i += 1) {
+          const angle = (i / 4) * Math.PI * 2;
+          const block = new THREE.Mesh(crenellationGeo, material);
+          block.position.set(Math.cos(angle) * 0.135, 0.66, Math.sin(angle) * 0.135);
+          block.rotation.y = angle;
+          block.castShadow = true;
+          group.add(block);
+        }
         break;
       }
       case 'n': {
