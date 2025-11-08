@@ -50,6 +50,9 @@ scene.add(boardGroup);
 const piecesGroup = new THREE.Group();
 scene.add(piecesGroup);
 
+const notationGroup = new THREE.Group();
+scene.add(notationGroup);
+
 const squareCenters = buildSquareLookup();
 const piecesBySquare = new Map();
 
@@ -63,6 +66,7 @@ let dragStartSquare = null;
 let editorBoard = null;
 
 loadPosition(defaultFEN);
+addBoardNotation();
 
 loadBtn.addEventListener('click', () => loadPosition(fenInput.value));
 resetBtn.addEventListener('click', () => {
@@ -173,6 +177,66 @@ function buildSquareLookup() {
     }
   }
   return map;
+}
+
+function addBoardNotation() {
+  notationGroup.clear();
+  const half = (boardConfig.squareSize * 8) / 2; // 4 squares each direction
+  const offset = half + 0.35;
+  const labelHeight = pieceBaseY + boardConfig.tileThickness + 0.02;
+
+  files.forEach((file, index) => {
+    const x = (index - 3.5) * boardConfig.squareSize;
+    const bottom = createLabelMesh(file, 0.5);
+    bottom.position.set(x, labelHeight, -offset);
+    notationGroup.add(bottom);
+
+    const top = createLabelMesh(file, 0.5);
+    top.position.set(x, labelHeight, offset);
+    notationGroup.add(top);
+  });
+
+  const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+  ranks.forEach((rank, index) => {
+    const z = (index - 3.5) * boardConfig.squareSize;
+    const left = createLabelMesh(rank, 0.5);
+    left.position.set(-offset, labelHeight, z);
+    notationGroup.add(left);
+
+    const right = createLabelMesh(rank, 0.5);
+    right.position.set(offset, labelHeight, z);
+    notationGroup.add(right);
+  });
+}
+
+function createLabelMesh(text, size = 0.45) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(0,0,0,0)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f6f7ff';
+  ctx.font = 'bold 140px "Source Sans Pro", "Segoe UI", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text.toUpperCase(), canvas.width / 2, canvas.height / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+  const geometry = new THREE.PlaneGeometry(size, size);
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.y += 0.001;
+  return mesh;
 }
 
 function loadPosition(fen) {
