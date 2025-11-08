@@ -56,17 +56,29 @@ export function createPieceManager(squareCenters) {
         group.add(top);
         break;
       }
-      case 'q': {
-        const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 0.35, 24), material);
-        crown.position.y = 0.7;
-        crown.castShadow = true;
-        group.add(crown);
-        const gems = new THREE.Mesh(new THREE.TetrahedronGeometry(0.15), material);
-        gems.position.y = 0.95;
-        gems.castShadow = true;
-        group.add(gems);
-        break;
+    case 'q': {
+      const lowerCrown = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.37, 0.35, 32), material);
+      lowerCrown.position.y = 0.7;
+      lowerCrown.castShadow = true;
+      group.add(lowerCrown);
+
+      const crownBand = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.035, 12, 32), material);
+      crownBand.rotation.x = Math.PI / 2;
+      crownBand.position.y = 0.9;
+      crownBand.castShadow = true;
+      group.add(crownBand);
+
+      const spikeGeo = new THREE.ConeGeometry(0.085, 0.24, 12);
+      for (let i = 0; i < 6; i += 1) {
+        const angle = (i / 6) * Math.PI * 2;
+        const spike = new THREE.Mesh(spikeGeo, material);
+        spike.position.set(Math.cos(angle) * 0.18, 1, Math.sin(angle) * 0.18);
+        spike.castShadow = true;
+        group.add(spike);
       }
+
+      break;
+    }
       case 'k':
       default: {
         const neck = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.4, 24), material);
