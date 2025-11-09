@@ -8,7 +8,7 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230f1117'/%3E%3Cpath d='M20 44h24M24 20h16l4 20H20l4-20z' stroke='%23f5f7ff' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="src/styles/style.css?v=20240416" />
+    <link rel="stylesheet" href="src/styles/style.css?v=20240530" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
@@ -17,25 +17,39 @@
     />
   </head>
   <body>
-    <main>
-      <section class="controls">
-        <h1>WebChess 3D</h1>
-        <label for="fen-input">Forsyth–Edwards Notation (FEN)</label>
-        <textarea id="fen-input" rows="2" spellcheck="false"></textarea>
-        <div class="buttons">
-          <button id="load-btn">Load Position</button>
-          <button id="reset-btn">Reset Camera</button>
-          <button id="edit-btn">Edit Board</button>
+    <main id="app-shell">
+      <section class="controls" aria-expanded="true">
+        <div class="controls-heading">
+          <h1>WebChess 3D</h1>
+          <button
+            id="sidebar-toggle"
+            class="sidebar-toggle"
+            type="button"
+            aria-controls="sidebar-content"
+            aria-expanded="true"
+          >
+            <span class="label-expanded">Hide Sidebar</span>
+            <span class="label-collapsed">Show Sidebar</span>
+          </button>
         </div>
-        <label class="toggle" for="env-toggle">
-          <input type="checkbox" id="env-toggle" checked />
-          <span>Show environment</span>
-        </label>
-        <p id="status" class="status"></p>
-        <p class="hint">
-          Paste any legal FEN and press Load. Drag with left mouse to move pieces,
-          right mouse to orbit, and scroll to zoom.
-        </p>
+        <div class="controls-content" id="sidebar-content">
+          <label for="fen-input">Forsyth–Edwards Notation (FEN)</label>
+          <textarea id="fen-input" rows="2" spellcheck="false"></textarea>
+          <div class="buttons">
+            <button id="load-btn">Load Position</button>
+            <button id="reset-btn">Reset Camera</button>
+            <button id="edit-btn">Edit Board</button>
+          </div>
+          <label class="toggle" for="env-toggle">
+            <input type="checkbox" id="env-toggle" checked />
+            <span>Show environment</span>
+          </label>
+          <p id="status" class="status"></p>
+          <p class="hint">
+            Paste any legal FEN and press Load. Drag with left mouse to move pieces,
+            right mouse to orbit, and scroll to zoom.
+          </p>
+        </div>
       </section>
       <section class="viewport">
         <canvas id="scene"></canvas>
@@ -78,17 +92,17 @@
         "imports": {
           "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
           "three/examples/jsm/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js",
-          "./config.js": "./src/scripts/config.js?v=20240416",
-          "./board.js": "./src/scripts/board.js?v=20240416",
-          "./editor.js": "./src/scripts/editor.js?v=20240416",
-          "./fen.js": "./src/scripts/fen.js?v=20240416",
-          "./drag.js": "./src/scripts/drag.js?v=20240416",
-          "./pieces.js": "./src/scripts/pieces.js?v=20240416",
-          "./scene.js": "./src/scripts/scene.js?v=20240416",
-          "./environment.js": "./src/scripts/environment.js?v=20240416"
+          "./config.js": "./src/scripts/config.js?v=20240530",
+          "./board.js": "./src/scripts/board.js?v=20240530",
+          "./editor.js": "./src/scripts/editor.js?v=20240530",
+          "./fen.js": "./src/scripts/fen.js?v=20240530",
+          "./drag.js": "./src/scripts/drag.js?v=20240530",
+          "./pieces.js": "./src/scripts/pieces.js?v=20240530",
+          "./scene.js": "./src/scripts/scene.js?v=20240530",
+          "./environment.js": "./src/scripts/environment.js?v=20240530"
         }
       }
     </script>
-    <script type="module" src="src/scripts/main.js?v=20240416"></script>
+    <script type="module" src="src/scripts/main.js?v=20240530"></script>
   </body>
 </html>

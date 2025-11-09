@@ -22,6 +22,9 @@ const editorApplyBtn = document.getElementById('editor-apply');
 const editorBoardContainer = document.getElementById('editor-board');
 const environmentToggle = document.getElementById('env-toggle');
 const viewport = document.querySelector('.viewport');
+const appShell = document.getElementById('app-shell');
+const sidebar = document.querySelector('.controls');
+const sidebarToggle = document.getElementById('sidebar-toggle');
 
 const fenFromUrl = new URL(window.location.href).searchParams.get('fen');
 const initialFen = fenFromUrl && fenFromUrl.trim() ? fenFromUrl.trim() : defaultFEN;
@@ -99,6 +102,15 @@ window.addEventListener('pointerup', dragController.onPointerUp);
 window.addEventListener('resize', onResize);
 window.addEventListener('keydown', onKeyDown);
 canvas.addEventListener('contextmenu', (event) => event.preventDefault());
+sidebarToggle?.addEventListener('click', () => {
+  if (!appShell || !sidebar) return;
+  const shouldCollapse = !appShell.classList.contains('sidebar-collapsed');
+  appShell.classList.toggle('sidebar-collapsed', shouldCollapse);
+  const expanded = !shouldCollapse;
+  sidebar.setAttribute('aria-expanded', String(expanded));
+  sidebarToggle.setAttribute('aria-expanded', String(expanded));
+  onResize();
+});
 
 function loadPosition(fen) {
   const fenString = fen && fen.trim() ? fen.trim() : defaultFEN;
