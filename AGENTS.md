@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-`index.html` is the only HTML entry point and wires up `style.css`, `main.js`, and the CDN import map for Three.js, OrbitControls, jQuery, and Chessboard.js. `main.js` owns all rendering logic: board construction, lighting, drag interactions, and the modal editor. Global textures and reference media live under `img/`, while `screenshot*.png` files document UI states—keep large binaries out of the root. Treat `boardConfig`, `squareCenters`, and `piecesGroup` as the extension points for geometry, look-and-feel, and chess logic respectively.
+`index.html` is the only HTML entry point and wires up `src/styles/style.css`, `src/scripts/main.js`, and the CDN import map for Three.js, OrbitControls, jQuery, and Chessboard.js. `src/scripts/` houses all rendering logic modules (board construction, lighting, drag interactions, and the modal editor), with `main.js` orchestrating them. Global textures and reference media live under `img/`, while UI-state captures (`screenshot*.png`) are organized inside `img/screenshots/` to keep the root lean. Treat `boardConfig`, `squareCenters`, and `piecesGroup` as the extension points for geometry, look-and-feel, and chess logic respectively.
 
 ## Build, Test, and Development Commands
 - `npx http-server . --port 4173` — preferred local server; preserves ES module imports.
