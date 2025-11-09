@@ -20,6 +20,8 @@ const editorClearBtn = document.getElementById('editor-clear');
 const editorStartBtn = document.getElementById('editor-start');
 const editorApplyBtn = document.getElementById('editor-apply');
 const editorBoardContainer = document.getElementById('editor-board');
+const environmentToggle = document.getElementById('env-toggle');
+const viewport = document.querySelector('.viewport');
 
 const fenFromUrl = new URL(window.location.href).searchParams.get('fen');
 const initialFen = fenFromUrl && fenFromUrl.trim() ? fenFromUrl.trim() : defaultFEN;
@@ -27,6 +29,7 @@ fenInput.value = initialFen;
 
 const renderer = createRenderer(canvas);
 const scene = createScene();
+const defaultSceneBackground = scene.background;
 const camera = createCamera(canvas);
 const controls = createControls(camera, canvas);
 resizeRenderer(renderer, camera, canvas);
@@ -36,6 +39,17 @@ addLights(scene);
 const environment = createEnvironment();
 scene.add(environment);
 const updateEnvironmentVisibility = environment.userData?.updateVisibility;
+applyEnvironmentVisibility();
+
+if (environmentToggle) {
+  environmentToggle.addEventListener('change', () => {
+    applyEnvironmentVisibility();
+    if (environment.visible && updateEnvironmentVisibility) {
+      updateEnvironmentVisibility(camera);
+    }
+    setStatus(environment.visible ? 'Environment enabled' : 'Environment hidden', false);
+  });
+}
 
 const boardGroup = buildBoard();
 scene.add(boardGroup);
@@ -130,9 +144,25 @@ function animate(time) {
   lastTime = time;
   controls.update();
   pieceManager.update(delta);
-  if (updateEnvironmentVisibility) {
+  if (updateEnvironmentVisibility && environment.visible) {
     updateEnvironmentVisibility(camera);
   }
   renderer.render(scene, camera);
 }
 requestAnimationFrame(animate);
+
+function applyEnvironmentVisibility() {
+  const visible = environmentToggle ? environmentToggle.checked : true;
+  environment.visible = visible;
+  if (visible) {
+    if (defaultSceneBackground) {
+      scene.background = defaultSceneBackground;
+    }
+    renderer.setClearAlpha(1);
+    viewport?.classList.remove('gradient-bg');
+  } else {
+    scene.background = null;
+    renderer.setClearAlpha(0);
+    viewport?.classList.add('gradient-bg');
+  }
+}
